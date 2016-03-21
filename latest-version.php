@@ -156,15 +156,6 @@
 				</strong></p>
 			</div>
 			
-			<!--DEBUG DIV REMOVE ONCE LIVE -->
-			<div id="debug">
-				<?PHP
-					echo($conversion_status . '<br />' . $_GET['err']);
-					var_dump($conversion_status);
-				?>
-			</div>
-			<!--DEBUG DIV REMOVE ONCE LIVE -->
-			
 			<?PHP
 	
 	// action each status
@@ -173,9 +164,17 @@
 				case 0:
 					// upload
 					$target_file = $target_dir . basename($_FILES['file_name']['name']);
-					$file_ext = pathinfo($target_file, PATHINFO_EXTENSION);						
-					$conversion_status++;
-					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');					
+					$file_ext = pathinfo($target_file, PATHINFO_EXTENSION);
+
+					if(strcasecmp($file_ext, 'xlsx') != 0){
+						$conversion_status = 5;
+						$err = urlencode('Invalid file type specified, please use ' . $company_name . ' standard templates ONLY.');
+						echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '&err=' . htmlentities($err) . '");</script>');
+					} else {
+						$conversion_status++;
+						echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');		
+					}
+					
 					break;
 				case 1:
 					// validate
