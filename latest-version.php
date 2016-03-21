@@ -28,6 +28,14 @@
 		$company_name = 'ABC';
 	}
 	
+	function Progress($c){
+		$c++;
+		return '<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $c . '");</script>';
+	}
+	
+	function Error($e){
+		return '<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=5&err=' . htmlentities(urlencode($e)) . '");</script>';
+	}
 ?>
 
 <!DOCTYPE html>
@@ -167,36 +175,51 @@
 					$file_ext = pathinfo($target_file, PATHINFO_EXTENSION);
 
 					if(strcasecmp($file_ext, 'xlsx') != 0){
-						$conversion_status = 5;
-						$err = urlencode('Invalid file type specified, please use ' . $company_name . ' standard templates ONLY.');
-						echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '&err=' . htmlentities($err) . '");</script>');
+						
+						echo Error('Invalid file type specified, please use ' . $company_name . ' standard templates ONLY.');
+						
+					} elseif(file_exists($target_file)){
+						
+						echo Error('File already uploaded, please wait until existing conversion is complete.');
+						
+					} elseif($_FILES['file_name']['size'] > 3000000){
+						
+						echo Error('File too large, max file size is 3MB.');
+						
 					} else {
-						$conversion_status++;
-						echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');		
-					}
+						
+						if(move_uploaded_file($_FILES['file_name']['tmp_name'], $target_file) == false){
+							
+							echo Error('File could not be uploaded (unexpected error) please try again.');
+						}
+					}										
 					
+					echo Progress($conversion_status);
+										
 					break;
 				case 1:
 					// validate
-					$conversion_status++;
-					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');
+					
+					
+					echo Progress($conversion_status);
 					break;
 				case 2:
 					// convert
-					$conversion_status++;
-					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');
+					
+					echo Progress($conversion_status);
 					break;
 				case 3:
 					// finalise
-					$conversion_status++;
-					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');
+					
+					echo Progress($conversion_status);
 					break;
 				case 4:
 					// download
-					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');
+					
 					break;
 				case 5:
 					//error occured - message already displayed so just break
+					
 					break;
 				case 99:
 					break;
