@@ -7,17 +7,19 @@
 		'Validating',			// [1]
 		'Converting',			// [2]
 		'Finalising',			// [3]
-		'Downloading results',	// [4]
+		'Downloading',			// [4]
 		'Error'					// [5]
 		);
 		
 	
 	$target_dir = 'tmp/';
 	
-	if(isset($_GET['s'])){
+	if(isset($_POST['pressed'])){
+		$conversion_status = 0;
+	} elseif(isset($_GET['s'])){
 		$conversion_status = $_GET['s'];
 	} else {
-		$conversion_status = 'blank';
+		$conversion_status = 99;
 	}
 	
 	if(isset($_GET['name'])){
@@ -26,9 +28,6 @@
 		$company_name = 'ABC';
 	}
 	
-	if(isset($_POST['pressed'])){
-		$conversion_status = 0;
-	}
 ?>
 
 <!DOCTYPE html>
@@ -130,7 +129,7 @@
 	
 	<?PHP
 	
-		if($conversion_status == 'blank'){
+		if($conversion_status == 99){
 			?>
 			<form id="file_upload" method="POST" action="abc-conversion-demo.php" enctype="multipart/form-data">
 				<p>Please select a file to upload:</p>
@@ -148,8 +147,10 @@
 					if($conversion_status == 5){
 						echo('There was an error uploading your file:<br /><br />' . urldecode($_GET['err']) . '</p><p>Please try again');
 					} else {				
-						echo('Your file is currently ' . $status[$conversion_status]);
+						echo('Your file is currently ' . strtolower($status[$conversion_status]));
 					}
+				?>
+				<?PHP
 		}
 				?>				
 				</strong></p>
@@ -159,24 +160,22 @@
 			<div id="debug">
 				<?PHP
 					echo($conversion_status . '<br />' . $_GET['err']);
+					var_dump($conversion_status);
 				?>
 			</div>
 			<!--DEBUG DIV REMOVE ONCE LIVE -->
 			
 			<?PHP
-		
 	
 	// action each status
 	
 			switch($conversion_status){
-				case 'blank':
-					break;
 				case 0:
 					// upload
 					$target_file = $target_dir . basename($_FILES['file_name']['name']);
-					$file_ext = pathinfo($target_file, PATHINFO_EXTENSION);
-						$conversion_status++;
-						echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');					
+					$file_ext = pathinfo($target_file, PATHINFO_EXTENSION);						
+					$conversion_status++;
+					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php?s=' . $conversion_status . '");</script>');					
 					break;
 				case 1:
 					// validate
@@ -200,8 +199,10 @@
 				case 5:
 					//error occured - message already displayed so just break
 					break;
+				case 99:
+					break;
 				default:
-					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php");</script>');
+					echo('<script>window.location.replace("http://www.themacroman.com/abc-conversion-demo.php");</script>');				
 					break;
 			}
 		
